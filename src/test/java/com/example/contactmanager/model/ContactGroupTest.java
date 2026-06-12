@@ -13,10 +13,10 @@ public class ContactGroupTest {
  
 	@Test
 	public void testContactGroupCanAddContact() {
-		ContactGroup group = new coontectGroup("Family");
-		contact contact =new contact("mohamed","+399123456789");
-		group.addcontact(contact);
-		assertThat(group.getcontacts()).contains(contact);
+		 ContactGroup group = new ContactGroup("Family");
+		Contact contact =new Contact("mohamed","+399123456789");
+		 group.addContact(contact);
+	        assertThat(group.getContacts()).contains(contact);
 		
 	}
 	
