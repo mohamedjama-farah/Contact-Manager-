@@ -6,7 +6,7 @@ import java.util.List;
 public interface ContactRepository {
 	
 	void save(Contact contact);
-	List<Contact> FindAll();
+	List<Contact> findAll();
 	void delete(String id );
 	
 
