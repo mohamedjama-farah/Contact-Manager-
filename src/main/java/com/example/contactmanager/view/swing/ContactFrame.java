@@ -9,7 +9,7 @@ import java.util.List;
 
 public class ContactFrame extends JFrame implements ContactView {
 
-    private ContactController controller;
+    private volatile ContactController controller;
     private JList<String> contactList;
     private DefaultListModel<String> listModel;
     private JTextField nameField;
@@ -18,8 +18,8 @@ public class ContactFrame extends JFrame implements ContactView {
     private JButton deleteButton;
     private List<Contact> currentContacts;
 
-    public ContactFrame(ContactController controller) {
-        this.controller = controller;
+    public ContactFrame(ContactController initialController) {
+        this.controller = initialController;
         setTitle("Contact Manager");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(400, 300);
@@ -62,7 +62,10 @@ public class ContactFrame extends JFrame implements ContactView {
         });
     }
 
-    @Override
+    public void setController(ContactController controller) {
+        this.controller = controller;
+    }
+
     public void showAllContacts(List<Contact> contacts) {
         this.currentContacts = contacts;
         listModel.clear();
@@ -71,17 +74,15 @@ public class ContactFrame extends JFrame implements ContactView {
         }
     }
 
-    @Override
     public void showError(String message) {
-        JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(this, message, "Error",
+            JOptionPane.ERROR_MESSAGE);
     }
 
-    @Override
     public void contactAdded(Contact contact) {
         controller.allContacts();
     }
 
-    @Override
     public void contactDeleted(String id) {
         controller.allContacts();
     }
