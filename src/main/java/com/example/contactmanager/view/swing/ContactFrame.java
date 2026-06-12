@@ -14,6 +14,7 @@ public class ContactFrame extends JFrame implements ContactView {
     private DefaultListModel<String> listModel;
     private JTextField nameField;
     private JTextField phoneField;
+    private JTextField emailField;
     private JButton addButton;
     private JButton deleteButton;
     private List<Contact> currentContacts;
@@ -22,7 +23,7 @@ public class ContactFrame extends JFrame implements ContactView {
         this.controller = initialController;
         setTitle("Contact Manager");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(400, 300);
+        setSize(400, 350);
         setLayout(new BorderLayout());
 
         listModel = new DefaultListModel<>();
@@ -30,11 +31,13 @@ public class ContactFrame extends JFrame implements ContactView {
         contactList.setName("contactList");
         add(new JScrollPane(contactList), BorderLayout.CENTER);
 
-        JPanel inputPanel = new JPanel(new GridLayout(3, 2));
+        JPanel inputPanel = new JPanel(new GridLayout(4, 2));
         nameField = new JTextField();
         nameField.setName("nameField");
         phoneField = new JTextField();
         phoneField.setName("phoneField");
+        emailField = new JTextField();
+        emailField.setName("emailField");
         addButton = new JButton("Add");
         addButton.setName("addButton");
         deleteButton = new JButton("Delete");
@@ -44,14 +47,17 @@ public class ContactFrame extends JFrame implements ContactView {
         inputPanel.add(nameField);
         inputPanel.add(new JLabel("Phone:"));
         inputPanel.add(phoneField);
+        inputPanel.add(new JLabel("Email:"));
+        inputPanel.add(emailField);
         inputPanel.add(addButton);
         inputPanel.add(deleteButton);
         add(inputPanel, BorderLayout.SOUTH);
 
         addButton.addActionListener(e -> {
-            controller.addContact(nameField.getText(), phoneField.getText());
+            controller.addContact(nameField.getText(), phoneField.getText(), emailField.getText());
             nameField.setText("");
             phoneField.setText("");
+            emailField.setText("");
         });
 
         deleteButton.addActionListener(e -> {
@@ -70,7 +76,7 @@ public class ContactFrame extends JFrame implements ContactView {
         this.currentContacts = contacts;
         listModel.clear();
         for (Contact c : contacts) {
-            listModel.addElement(c.getName() + " - " + c.getPhone());
+            listModel.addElement(c.getName() + " - " + c.getPhone() + " - " + c.getEmail());
         }
     }
 

@@ -16,9 +16,7 @@ public class ContactFrameTest {
 
     private FrameFixture window;
     private ContactFrame frame;
-
-    @Mock
-    private ContactController controller;
+    @Mock private ContactController controller;
 
     @Before
     public void setUp() {
@@ -35,9 +33,7 @@ public class ContactFrameTest {
 
     @Test
     public void testShowAllContactsDisplaysContactsInList() {
-        List<Contact> contacts = Arrays.asList(
-            new Contact("Mohamed", "0039123456789")
-        );
+        List<Contact> contacts = Arrays.asList(new Contact("Mohamed", "0039123456789", "mohamed@example.com"));
         frame.showAllContacts(contacts);
         window.list("contactList").requireItemCount(1);
     }
@@ -46,13 +42,14 @@ public class ContactFrameTest {
     public void testAddButtonCallsController() {
         window.textBox("nameField").enterText("Mohamed");
         window.textBox("phoneField").enterText("0039123456789");
+        window.textBox("emailField").enterText("mohamedexample.com");
         window.button("addButton").click();
-        verify(controller).addContact("Mohamed", "0039123456789");
+        verify(controller).addContact("Mohamed", "0039123456789", "mohamedexample.com");
     }
 
     @Test
     public void testDeleteButtonCallsController() {
-        Contact contact = new Contact("Mohamed", "0039123456789");
+        Contact contact = new Contact("Mohamed", "0039123456789", "mohamed@example.com");
         contact.setId("1");
         frame.showAllContacts(Arrays.asList(contact));
         window.list("contactList").selectItem(0);
