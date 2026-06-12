@@ -13,12 +13,8 @@ import java.util.List;
 
 public class ContactControllerTest {
 
-    @Mock
-    private ContactRepository repository;
-
-    @Mock
-    private ContactView view;
-
+    @Mock private ContactRepository repository;
+    @Mock private ContactView view;
     private ContactController controller;
 
     @Before
@@ -29,7 +25,7 @@ public class ContactControllerTest {
 
     @Test
     public void testAllContactsShouldShowAllContactsFromRepository() {
-        List<Contact> contacts = Arrays.asList(new Contact("Mohamed", "+39123456789"));
+        List<Contact> contacts = Arrays.asList(new Contact("Mohamed", "0039123456789", "mohamed@example.com"));
         when(repository.findAll()).thenReturn(contacts);
         controller.allContacts();
         verify(view).showAllContacts(contacts);
@@ -37,7 +33,7 @@ public class ContactControllerTest {
 
     @Test
     public void testAddContactShouldSaveToRepositoryAndUpdateView() {
-        controller.addContact("Mohamed", "+39123456789");
+        controller.addContact("Mohamed", "0039123456789", "mohamed@example.com");
         verify(repository).save(any(Contact.class));
         verify(view).contactAdded(any(Contact.class));
     }

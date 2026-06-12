@@ -25,7 +25,8 @@ public class MongoContactRepository implements ContactRepository {
     @Override
     public void save(Contact contact) {
         Document doc = new Document("name", contact.getName())
-                .append("phone", contact.getPhone());
+                .append("phone", contact.getPhone())
+                .append("email", contact.getEmail());
         collection.insertOne(doc);
         contact.setId(doc.getObjectId("_id").toString());
     }
@@ -36,7 +37,8 @@ public class MongoContactRepository implements ContactRepository {
         for (Document doc : collection.find()) {
             Contact contact = new Contact(
                 doc.getString("name"),
-                doc.getString("phone")
+                doc.getString("phone"),
+                doc.getString("email")
             );
             contact.setId(doc.getObjectId("_id").toString());
             contacts.add(contact);

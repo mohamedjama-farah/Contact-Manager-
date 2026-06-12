@@ -6,10 +6,10 @@ import org.junit.Test;
 public class ContactTest {
 
     @Test
-    public void testContactHasNameAndPhone() {
-        Contact contact = new Contact("Mohamed", "+39123456789");
+    public void testContactHasNamePhoneAndEmail() {
+        Contact contact = new Contact("Mohamed", "0039123456789", "mohamed@example.com");
         assertThat(contact.getName()).isEqualTo("Mohamed");
-        assertThat(contact.getPhone()).isEqualTo("+39123456789");
+        assertThat(contact.getPhone()).isEqualTo("0039123456789");
+        assertThat(contact.getEmail()).isEqualTo("mohamed@example.com");
     }
-
 }

@@ -20,8 +20,8 @@ public class ContactController {
         view.showAllContacts(contacts);
     }
 
-    public void addContact(String name, String phone) {
-        Contact contact = new Contact(name, phone);
+    public void addContact(String name, String phone, String email) {
+        Contact contact = new Contact(name, phone, email);
         repository.save(contact);
         view.contactAdded(contact);
     }

@@ -14,8 +14,7 @@ import com.example.contactmanager.view.swing.ContactFrame;
 public class ContactManagerE2EIT {
 
     @ClassRule
-    public static MongoDBContainer mongo =
-        new MongoDBContainer("mongo:6.0");
+    public static MongoDBContainer mongo = new MongoDBContainer("mongo:6.0");
 
     private FrameFixture window;
     private MongoContactRepository repository;
@@ -25,10 +24,7 @@ public class ContactManagerE2EIT {
     @Before
     public void setUp() {
         repository = new MongoContactRepository(
-            mongo.getConnectionString(),
-            "contactmanager",
-            "contacts"
-        );
+            mongo.getConnectionString(), "contactmanager", "contacts");
         frame = new ContactFrame(null);
         controller = new ContactController(repository, frame);
         frame.setController(controller);
@@ -46,9 +42,9 @@ public class ContactManagerE2EIT {
     public void testAddAndDeleteContact() {
         window.textBox("nameField").enterText("Mohamed");
         window.textBox("phoneField").enterText("0039123456789");
+        window.textBox("emailField").enterText("mohamedexample.com");
         window.button("addButton").click();
         window.list("contactList").requireItemCount(1);
-
         window.list("contactList").selectItem(0);
         window.button("deleteButton").click();
         window.list("contactList").requireItemCount(0);
