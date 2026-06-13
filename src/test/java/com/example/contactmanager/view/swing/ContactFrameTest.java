@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 import org.assertj.swing.finder.JOptionPaneFinder;
 import org.assertj.swing.fixture.FrameFixture;
-import org.assertj.swing.fixture.JOptionPaneFixture;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,11 +45,11 @@ public class ContactFrameTest {
     @Test
     public void testShowErrorDisplaysDialog() {
         SwingUtilities.invokeLater(() -> frame.showError("Test error"));
-        JOptionPaneFixture optionPane = JOptionPaneFinder.findOptionPane()
+        JOptionPaneFinder.findOptionPane()
             .withTimeout(2000)
-            .using(window.robot());
-        assertThat(optionPane.messageAsText()).isEqualTo("Test error");
-        optionPane.okButton().click();
+            .using(window.robot())
+            .requireMessage("Test error")
+            .okButton().click();
     }
 
     @Test
