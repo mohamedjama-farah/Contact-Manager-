@@ -40,4 +40,12 @@ public class MongoContactRepositoryIT {
         repository.delete(id);
         assertThat(repository.findAll()).isEmpty();
     }
+
+    @Test
+    public void testRepositoryCanBeClosed() {
+        MongoContactRepository repo = new MongoContactRepository(
+            mongo.getConnectionString(), "contactmanager", "close_test");
+        assertThat(repo).isNotNull();
+        repo.close();
+    }
 }

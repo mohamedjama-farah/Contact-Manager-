@@ -2,7 +2,9 @@ package com.example.contactmanager.view.swing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
+import org.assertj.swing.finder.JOptionPaneFinder;
 import org.assertj.swing.fixture.FrameFixture;
+import org.assertj.swing.fixture.JOptionPaneFixture;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import com.example.contactmanager.controller.ContactController;
 import com.example.contactmanager.model.Contact;
+import javax.swing.SwingUtilities;
 import java.util.Arrays;
 import java.util.List;
 
@@ -38,6 +41,16 @@ public class ContactFrameTest {
         frame.showAllContacts(contacts);
         window.list("contactList").requireItemCount(1);
         assertThat(window.list("contactList").contents()[0]).contains("Mohamed");
+    }
+
+    @Test
+    public void testShowErrorDisplaysDialog() {
+        SwingUtilities.invokeLater(() -> frame.showError("Test error"));
+        JOptionPaneFixture optionPane = JOptionPaneFinder.findOptionPane()
+            .withTimeout(2000)
+            .using(window.robot());
+        assertThat(optionPane.messageAsText()).isEqualTo("Test error");
+        optionPane.okButton().click();
     }
 
     @Test
