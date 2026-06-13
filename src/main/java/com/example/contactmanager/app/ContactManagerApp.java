@@ -19,6 +19,7 @@ public class ContactManagerApp {
         SwingUtilities.invokeLater(() -> {
             ContactFrame frame = new ContactFrame(null);
             ContactController controller = new ContactController(repository, frame);
+            frame.setController(controller);
             frame.setVisible(true);
             controller.allContacts();
         });

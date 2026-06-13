@@ -17,7 +17,8 @@
   </properties>
 
   <dependencies>
-    <!-- JUnit 4 — required for AssertJ-Swing GUI tests -->
+
+    <!-- JUnit 4 -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -33,7 +34,7 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- Mockito — mocking in unit tests -->
+    <!-- Mockito core -->
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
@@ -41,7 +42,7 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- AssertJ-Swing — GUI testing -->
+    <!-- AssertJ-Swing with JUnit 4 integration -->
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-swing-junit</artifactId>
@@ -56,19 +57,22 @@
       <version>4.11.1</version>
     </dependency>
 
-    <!-- Testcontainers — manages MongoDB container in IT tests -->
+    <!-- Testcontainers — MongoDB container -->
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>mongodb</artifactId>
       <version>1.19.3</version>
       <scope>test</scope>
     </dependency>
+
+    <!-- Testcontainers core -->
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>testcontainers</artifactId>
       <version>1.19.3</version>
       <scope>test</scope>
     </dependency>
+
   </dependencies>
 
   <build>
@@ -134,7 +138,7 @@
         </configuration>
       </plugin>
 
-      <!-- Failsafe — runs IT tests (*IT.java) in src/it/java -->
+      <!-- Failsafe — runs IT tests (*IT.java) -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
@@ -152,7 +156,7 @@
         </executions>
       </plugin>
 
-      <!-- PIT Mutation Testing — 0 survived mutants required -->
+      <!-- PIT Mutation Testing -->
       <plugin>
         <groupId>org.pitest</groupId>
         <artifactId>pitest-maven</artifactId>
