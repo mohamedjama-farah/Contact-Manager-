@@ -71,4 +71,10 @@ public class ContactFrameTest {
         window.button("deleteButton").click();
         verify(controller).deleteContact("1");
     }
+
+    @Test
+    public void testDeleteButtonDoesNothingWhenNoItemSelected() {
+        window.button("deleteButton").click();
+        verify(controller, never()).deleteContact(anyString());
+    }
 }
