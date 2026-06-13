@@ -22,7 +22,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build, test, and analyze
-        run: xvfb-run --auto-servernum mvn verify sonar:sonar coveralls:report
+        run: xvfb-run --auto-servernum mvn verify sonar:sonar coveralls:report -DrepoToken=$COVERALLS_REPO_TOKEN
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
