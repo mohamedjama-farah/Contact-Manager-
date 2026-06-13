@@ -7,10 +7,11 @@ import javax.swing.*;
 import javax.swing.WindowConstants;
 import java.awt.*;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ContactFrame extends JFrame implements ContactView {
 
-    private volatile transient ContactController controller;
+    private final AtomicReference<ContactController> controllerRef = new AtomicReference<>();
     private JList<String> contactList;
     private DefaultListModel<String> listModel;
     private JTextField nameField;
@@ -21,7 +22,7 @@ public class ContactFrame extends JFrame implements ContactView {
     private transient List<Contact> currentContacts;
 
     public ContactFrame(ContactController initialController) {
-        this.controller = initialController;
+        controllerRef.set(initialController);
         setTitle("Contact Manager");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setSize(400, 350);
@@ -55,7 +56,7 @@ public class ContactFrame extends JFrame implements ContactView {
         add(inputPanel, BorderLayout.SOUTH);
 
         addButton.addActionListener(e -> {
-            controller.addContact(nameField.getText(), phoneField.getText(), emailField.getText());
+            controllerRef.get().addContact(nameField.getText(), phoneField.getText(), emailField.getText());
             nameField.setText("");
             phoneField.setText("");
             emailField.setText("");
@@ -64,13 +65,13 @@ public class ContactFrame extends JFrame implements ContactView {
         deleteButton.addActionListener(e -> {
             int index = contactList.getSelectedIndex();
             if (index != -1) {
-                controller.deleteContact(currentContacts.get(index).getId());
+                controllerRef.get().deleteContact(currentContacts.get(index).getId());
             }
         });
     }
 
     public void setController(ContactController controller) {
-        this.controller = controller;
+        this.controllerRef.set(controller);
     }
 
     public void showAllContacts(List<Contact> contacts) {
@@ -87,10 +88,10 @@ public class ContactFrame extends JFrame implements ContactView {
     }
 
     public void contactAdded(Contact contact) {
-        controller.allContacts();
+        controllerRef.get().allContacts();
     }
 
     public void contactDeleted(String id) {
-        controller.allContacts();
+        controllerRef.get().allContacts();
     }
 }

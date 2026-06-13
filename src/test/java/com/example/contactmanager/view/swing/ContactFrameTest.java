@@ -1,5 +1,6 @@
 package com.example.contactmanager.view.swing;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 import org.assertj.swing.fixture.FrameFixture;
 import org.junit.After;
@@ -36,6 +37,7 @@ public class ContactFrameTest {
         List<Contact> contacts = Arrays.asList(new Contact("Mohamed", "0039123456789", "mohamed@example.com"));
         frame.showAllContacts(contacts);
         window.list("contactList").requireItemCount(1);
+        assertThat(window.list("contactList").contents()[0]).contains("Mohamed");
     }
 
     @Test

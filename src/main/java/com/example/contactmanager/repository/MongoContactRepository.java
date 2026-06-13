@@ -7,19 +7,26 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MongoContactRepository implements ContactRepository {
+public class MongoContactRepository implements ContactRepository, Closeable {
 
-    private MongoCollection<Document> collection;
+    private final MongoClient client;
+    private final MongoCollection<Document> collection;
 
     public MongoContactRepository(String connectionString,
                                    String databaseName,
                                    String collectionName) {
-        MongoClient client = MongoClients.create(connectionString);
-        MongoDatabase database = client.getDatabase(databaseName);
+        this.client = MongoClients.create(connectionString);
+        MongoDatabase database = this.client.getDatabase(databaseName);
         this.collection = database.getCollection(collectionName);
+    }
+
+    @Override
+    public void close() {
+        client.close();
     }
 
     @Override

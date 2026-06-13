@@ -45,8 +45,10 @@ public class ContactManagerE2EIT {
         window.textBox("emailField").enterText("mohamedexample.com");
         window.button("addButton").click();
         window.list("contactList").requireItemCount(1);
+        assertThat(repository.findAll()).hasSize(1);
         window.list("contactList").selectItem(0);
         window.button("deleteButton").click();
         window.list("contactList").requireItemCount(0);
+        assertThat(repository.findAll()).isEmpty();
     }
 }
