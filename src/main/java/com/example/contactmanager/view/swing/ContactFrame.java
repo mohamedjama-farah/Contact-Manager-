@@ -4,12 +4,13 @@ import com.example.contactmanager.controller.ContactController;
 import com.example.contactmanager.model.Contact;
 import com.example.contactmanager.view.ContactView;
 import javax.swing.*;
+import javax.swing.WindowConstants;
 import java.awt.*;
 import java.util.List;
 
 public class ContactFrame extends JFrame implements ContactView {
 
-    private volatile ContactController controller;
+    private volatile transient ContactController controller;
     private JList<String> contactList;
     private DefaultListModel<String> listModel;
     private JTextField nameField;
@@ -17,12 +18,12 @@ public class ContactFrame extends JFrame implements ContactView {
     private JTextField emailField;
     private JButton addButton;
     private JButton deleteButton;
-    private List<Contact> currentContacts;
+    private transient List<Contact> currentContacts;
 
     public ContactFrame(ContactController initialController) {
         this.controller = initialController;
         setTitle("Contact Manager");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setSize(400, 350);
         setLayout(new BorderLayout());
 
