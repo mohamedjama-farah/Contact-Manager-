@@ -75,6 +75,12 @@ The project uses three levels of testing:
 - Maven 3.x
 - Docker (for integration tests)
 
+### Clone
+```bash
+git clone https://github.com/mohamedjama-farah/Contact-Manager-.git
+cd Contact-Manager-
+```
+
 ### Run all tests
 ```bash
 mvn verify

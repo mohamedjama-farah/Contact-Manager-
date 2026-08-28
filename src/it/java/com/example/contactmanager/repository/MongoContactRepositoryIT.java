@@ -42,6 +42,40 @@ public class MongoContactRepositoryIT {
     }
 
     @Test
+    public void testSaveAssignsGeneratedId() {
+        Contact contact = new Contact("Mohamed", "0039123456789", "mohamed@example.com");
+        repository.save(contact);
+        assertThat(contact.getId()).isNotNull();
+    }
+
+    @Test
+    public void testFindByIdReturnsMatchingContact() {
+        Contact contact = new Contact("Mohamed", "0039123456789", "mohamed@example.com");
+        repository.save(contact);
+        Contact found = repository.findById(contact.getId());
+        assertThat(found.getName()).isEqualTo("Mohamed");
+        assertThat(found.getId()).isEqualTo(contact.getId());
+    }
+
+    @Test
+    public void testFindByIdReturnsNullWhenNotFound() {
+        assertThat(repository.findById(new org.bson.types.ObjectId().toString())).isNull();
+    }
+
+    @Test
+    public void testUpdateChangesExistingContact() {
+        Contact contact = new Contact("Mohamed", "0039123456789", "mohamed@example.com");
+        repository.save(contact);
+        Contact edit = new Contact("NewName", "000111222", "new@example.com");
+        edit.setId(contact.getId());
+        repository.update(edit);
+        Contact reloaded = repository.findById(contact.getId());
+        assertThat(reloaded.getName()).isEqualTo("NewName");
+        assertThat(reloaded.getPhone()).isEqualTo("000111222");
+        assertThat(reloaded.getEmail()).isEqualTo("new@example.com");
+    }
+
+    @Test
     public void testRepositoryCanBeClosed() {
         MongoContactRepository repo = new MongoContactRepository(
             mongo.getConnectionString(), "contactmanager", "close_test");

@@ -55,4 +55,15 @@ public class ContactControllerTest {
         verify(repository).update(any(Contact.class));
         verify(view).contactUpdated(any(Contact.class));
     }
+
+    @Test
+    public void testUpdateContactWhenNotFoundShouldShowError() {
+        when(repository.findById("99")).thenReturn(null);
+
+        controller.updateContact("99", "X", "Y", "Z");
+
+        verify(view).showError("No existing contact with id 99");
+        verify(repository, never()).update(any(Contact.class));
+        verify(view, never()).contactUpdated(any(Contact.class));
+    }
 }
