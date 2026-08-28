@@ -57,4 +57,29 @@ public class MongoContactRepository implements ContactRepository, Closeable {
     public void delete(String id) {
         collection.deleteOne(new Document("_id", new ObjectId(id)));
     }
+
+    @Override
+    public Contact findById(String id) {
+        Document doc = collection.find(new Document("_id", new ObjectId(id))).first();
+        if (doc == null) {
+            return null;
+        }
+        Contact contact = new Contact(
+            doc.getString("name"),
+            doc.getString("phone"),
+            doc.getString("email")
+        );
+        contact.setId(doc.getObjectId("_id").toString());
+        return contact;
+    }
+
+    @Override
+    public void update(Contact contact) {
+        collection.replaceOne(
+            new Document("_id", new ObjectId(contact.getId())),
+            new Document("name", contact.getName())
+                .append("phone", contact.getPhone())
+                .append("email", contact.getEmail())
+        );
+    }
 }

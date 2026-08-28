@@ -97,4 +97,8 @@ public class ContactFrame extends JFrame implements ContactView {
     public void contactDeleted(String id) {
         controllerRef.get().allContacts();
     }
+
+    public void contactUpdated(Contact contact) {
+        controllerRef.get().allContacts();
+    }
 }
