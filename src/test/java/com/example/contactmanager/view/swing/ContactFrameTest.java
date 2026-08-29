@@ -95,4 +95,28 @@ public class ContactFrameTest {
         frame.contactUpdated(new Contact("Mohamed", "0039123456789", "mohamed@example.com"));
         verify(controller).allContacts();
     }
+
+    @Test
+    public void testUpdateButtonCallsController() {
+        Contact contact = new Contact("Mohamed", "0039123456789", "mohamed@example.com");
+        contact.setId("1");
+        GuiActionRunner.execute(new GuiTask() {
+            @Override
+            protected void executeInEDT() {
+                frame.showAllContacts(Arrays.asList(contact));
+            }
+        });
+        window.list("contactList").selectItem(0);
+        window.textBox("nameField").setText("NewName");
+        window.textBox("phoneField").setText("000111222");
+        window.textBox("emailField").setText("new@example.com");
+        window.button("updateButton").click();
+        verify(controller).updateContact("1", "NewName", "000111222", "new@example.com");
+    }
+
+    @Test
+    public void testUpdateButtonDoesNothingWhenNoItemSelected() {
+        window.button("updateButton").click();
+        verify(controller, never()).updateContact(anyString(), anyString(), anyString(), anyString());
+    }
 }
