@@ -3,18 +3,35 @@ package com.example.contactmanager.app;
 import com.example.contactmanager.controller.ContactController;
 import com.example.contactmanager.repository.MongoContactRepository;
 import com.example.contactmanager.view.swing.ContactFrame;
+import java.util.concurrent.Callable;
 import javax.swing.SwingUtilities;
+import picocli.CommandLine;
+import picocli.CommandLine.Option;
 
-public class ContactManagerApp {
+@CommandLine.Command(name = "contact-manager", mixinStandardHelpOptions = true)
+public class ContactManagerApp implements Callable<Void> {
+
+    @Option(names = { "--mongo-host" }, description = "MongoDB host")
+    private String mongoHost = "localhost";
+
+    @Option(names = { "--mongo-port" }, description = "MongoDB port")
+    private int mongoPort = 27017;
+
+    @Option(names = { "--db-name" }, description = "Database name")
+    private String databaseName = "contactmanager";
+
+    @Option(names = { "--collection-name" }, description = "Collection name")
+    private String collectionName = "contacts";
 
     public static void main(String[] args) {
-        String connectionString = "mongodb://localhost:27017";
-        String databaseName = "contactmanager";
-        String collectionName = "contacts";
+        new CommandLine(new ContactManagerApp()).execute(args);
+    }
 
+    @Override
+    public Void call() throws Exception {
+        String connectionString = "mongodb://" + mongoHost + ":" + mongoPort;
         MongoContactRepository repository = new MongoContactRepository(
-            connectionString, databaseName, collectionName
-        );
+            connectionString, databaseName, collectionName);
 
         SwingUtilities.invokeLater(() -> {
             ContactFrame frame = new ContactFrame(null);
@@ -23,5 +40,6 @@ public class ContactManagerApp {
             frame.setVisible(true);
             controller.allContacts();
         });
+        return null;
     }
 }

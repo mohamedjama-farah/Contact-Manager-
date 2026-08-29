@@ -2,6 +2,8 @@ package com.example.contactmanager.view.swing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
+import org.assertj.swing.edt.GuiActionRunner;
+import org.assertj.swing.edt.GuiTask;
 import org.assertj.swing.finder.JOptionPaneFinder;
 import org.assertj.swing.fixture.FrameFixture;
 import org.assertj.swing.fixture.JOptionPaneFixture;
@@ -38,7 +40,12 @@ public class ContactFrameTest {
     @Test
     public void testShowAllContactsDisplaysContactsInList() {
         List<Contact> contacts = Arrays.asList(new Contact("Mohamed", "0039123456789", "mohamed@example.com"));
-        frame.showAllContacts(contacts);
+        GuiActionRunner.execute(new GuiTask() {
+            @Override
+            protected void executeInEDT() {
+                frame.showAllContacts(contacts);
+            }
+        });
         window.list("contactList").requireItemCount(1);
         assertThat(window.list("contactList").contents()[0]).contains("Mohamed");
     }
@@ -66,7 +73,12 @@ public class ContactFrameTest {
     public void testDeleteButtonCallsController() {
         Contact contact = new Contact("Mohamed", "0039123456789", "mohamed@example.com");
         contact.setId("1");
-        frame.showAllContacts(Arrays.asList(contact));
+        GuiActionRunner.execute(new GuiTask() {
+            @Override
+            protected void executeInEDT() {
+                frame.showAllContacts(Arrays.asList(contact));
+            }
+        });
         window.list("contactList").selectItem(0);
         window.button("deleteButton").click();
         verify(controller).deleteContact("1");
@@ -76,5 +88,11 @@ public class ContactFrameTest {
     public void testDeleteButtonDoesNothingWhenNoItemSelected() {
         window.button("deleteButton").click();
         verify(controller, never()).deleteContact(anyString());
+    }
+
+    @Test
+    public void testContactUpdatedRefreshesContacts() {
+        frame.contactUpdated(new Contact("Mohamed", "0039123456789", "mohamed@example.com"));
+        verify(controller).allContacts();
     }
 }

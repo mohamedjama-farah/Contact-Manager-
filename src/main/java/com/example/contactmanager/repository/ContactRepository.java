@@ -8,6 +8,8 @@ public interface ContactRepository {
 	void save(Contact contact);
 	List<Contact> findAll();
 	void delete(String id );
+	Contact findById(String id);
+	void update(Contact contact);
 	
 
 }

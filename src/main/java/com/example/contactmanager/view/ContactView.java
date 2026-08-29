@@ -9,5 +9,6 @@ public interface ContactView {
 	void showError(String message);
 	void contactAdded(Contact contact);
 	void contactDeleted(String id);
+	void contactUpdated(Contact contact);
 
 }

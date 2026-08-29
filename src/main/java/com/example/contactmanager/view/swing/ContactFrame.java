@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ContactFrame extends JFrame implements ContactView {
-	
+
     private static final long serialVersionUID = 1L;
-    
+
 
     private final AtomicReference<ContactController> controllerRef = new AtomicReference<>();
     private JList<String> contactList;
@@ -95,6 +95,10 @@ public class ContactFrame extends JFrame implements ContactView {
     }
 
     public void contactDeleted(String id) {
+        controllerRef.get().allContacts();
+    }
+
+    public void contactUpdated(Contact contact) {
         controllerRef.get().allContacts();
     }
 }

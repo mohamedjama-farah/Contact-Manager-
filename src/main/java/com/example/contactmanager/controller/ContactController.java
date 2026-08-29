@@ -35,4 +35,15 @@ public class ContactController {
         repository.delete(id);
         view.contactDeleted(id);
     }
+    public void updateContact(String id, String name, String phone, String email) {
+        Contact existing = repository.findById(id);
+        if (existing == null) {
+            view.showError("No existing contact with id " + id);
+            return;
+        }
+        Contact updated = new Contact(name, phone, email);
+        updated.setId(id);
+        repository.update(updated);
+        view.contactUpdated(updated);
+    } 
 }
