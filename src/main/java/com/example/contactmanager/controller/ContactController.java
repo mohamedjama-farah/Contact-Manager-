@@ -21,10 +21,15 @@ public class ContactController {
     }
 
     public void addContact(String name, String phone, String email) {
+        if (name == null || name.trim().isEmpty()) {
+            view.showError("Name is required");
+            return;
+        }
         Contact contact = new Contact(name, phone, email);
         repository.save(contact);
         view.contactAdded(contact);
     }
+    
 
     public void deleteContact(String id) {
         repository.delete(id);
