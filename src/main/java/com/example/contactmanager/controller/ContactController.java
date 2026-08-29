@@ -25,16 +25,22 @@ public class ContactController {
             view.showError("Name is required");
             return;
         }
+        for (Contact existing : repository.findAll()) {
+            if (existing.getPhone().equals(phone)) {
+                view.showError("A contact with phone " + phone + " already exists");
+                return;
+            }
+        }
         Contact contact = new Contact(name, phone, email);
         repository.save(contact);
         view.contactAdded(contact);
     }
-    
 
     public void deleteContact(String id) {
         repository.delete(id);
         view.contactDeleted(id);
     }
+
     public void updateContact(String id, String name, String phone, String email) {
         Contact existing = repository.findById(id);
         if (existing == null) {
@@ -45,5 +51,5 @@ public class ContactController {
         updated.setId(id);
         repository.update(updated);
         view.contactUpdated(updated);
-    } 
+    }
 }
