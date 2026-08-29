@@ -39,6 +39,15 @@ public class ContactControllerTest {
     }
 
     @Test
+    public void testAddContactWithEmptyNameShouldShowErrorAndNotSave() {
+        controller.addContact("", "0039123456789", "mohamed@example.com");
+
+        verify(view).showError("Name is required");
+        verify(repository, never()).save(any(Contact.class));
+        verify(view, never()).contactAdded(any(Contact.class));
+    }
+
+    @Test
     public void testDeleteContactShouldDeleteFromRepositoryAndUpdateView() {
         controller.deleteContact("1");
         verify(repository).delete("1");
