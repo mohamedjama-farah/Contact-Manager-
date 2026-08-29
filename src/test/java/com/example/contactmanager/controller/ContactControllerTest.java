@@ -57,11 +57,37 @@ public class ContactControllerTest {
     }
 
     @Test
+    public void testAddContactWithDuplicatePhoneShouldShowErrorAndNotSave() {
+        Contact existing = new Contact("Mohamed", "0039123456789", "mohamed@example.com");
+        existing.setId("1");
+        when(repository.findAll()).thenReturn(Arrays.asList(existing));
+
+        controller.addContact("Ali", "0039123456789", "ali@example.com");
+
+        verify(view).showError("A contact with phone 0039123456789 already exists");
+        verify(repository, never()).save(any(Contact.class));
+        verify(view, never()).contactAdded(any(Contact.class));
+    }
+
+    @Test
+    public void testAddContactWithDifferentPhoneShouldSave() {
+        Contact existing = new Contact("Mohamed", "0039111111111", "mohamed@example.com");
+        existing.setId("1");
+        when(repository.findAll()).thenReturn(Arrays.asList(existing));
+
+        controller.addContact("Ali", "0039123456789", "ali@example.com");
+
+        verify(repository).save(any(Contact.class));
+        verify(view).contactAdded(any(Contact.class));
+    }
+
+    @Test
     public void testDeleteContactShouldDeleteFromRepositoryAndUpdateView() {
         controller.deleteContact("1");
         verify(repository).delete("1");
         verify(view).contactDeleted("1");
     }
+
     @Test
     public void testUpdateContactShouldSaveToRepositoryAndUpdateView() {
         Contact existing = new Contact("Mohamed", "0039123456789", "mohamed@example.com");
