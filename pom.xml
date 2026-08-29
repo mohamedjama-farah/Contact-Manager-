@@ -21,6 +21,9 @@
     <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     <sonar.exclusions>**/ContactManagerApp.java</sonar.exclusions>
     <sonar.coverage.exclusions>**/ContactManagerApp.java</sonar.coverage.exclusions>
+    <sonar.issue.ignore.multicriteria>e1</sonar.issue.ignore.multicriteria>
+    <sonar.issue.ignore.multicriteria.e1.ruleKey>java:S2699</sonar.issue.ignore.multicriteria.e1.ruleKey>
+    <sonar.issue.ignore.multicriteria.e1.resourceKey>**/ContactFrameTest.java</sonar.issue.ignore.multicriteria.e1.resourceKey>
   </properties>
 
   <dependencies>

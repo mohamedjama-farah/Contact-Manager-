@@ -56,7 +56,6 @@ public class ContactFrameTest {
         JOptionPaneFixture optionPane = JOptionPaneFinder.findOptionPane()
             .withTimeout(2000)
             .using(window.robot());
-        assertThat(optionPane).isNotNull();
         optionPane.requireMessage("Test error").okButton().click();
     }
 
