@@ -22,6 +22,7 @@ public class ContactFrame extends JFrame implements ContactView {
     private JTextField emailField;
     private JButton addButton;
     private JButton deleteButton;
+    private JButton updateButton;
     private transient List<Contact> currentContacts;
 
     public ContactFrame(ContactController initialController) {
@@ -36,7 +37,7 @@ public class ContactFrame extends JFrame implements ContactView {
         contactList.setName("contactList");
         add(new JScrollPane(contactList), BorderLayout.CENTER);
 
-        JPanel inputPanel = new JPanel(new GridLayout(4, 2));
+        JPanel inputPanel = new JPanel(new GridLayout(0, 2));
         nameField = new JTextField();
         nameField.setName("nameField");
         phoneField = new JTextField();
@@ -47,6 +48,8 @@ public class ContactFrame extends JFrame implements ContactView {
         addButton.setName("addButton");
         deleteButton = new JButton("Delete");
         deleteButton.setName("deleteButton");
+        updateButton = new JButton("Update");
+        updateButton.setName("updateButton");
 
         inputPanel.add(new JLabel("Name:"));
         inputPanel.add(nameField);
@@ -56,6 +59,7 @@ public class ContactFrame extends JFrame implements ContactView {
         inputPanel.add(emailField);
         inputPanel.add(addButton);
         inputPanel.add(deleteButton);
+        inputPanel.add(updateButton);
         add(inputPanel, BorderLayout.SOUTH);
 
         addButton.addActionListener(e -> {
@@ -69,6 +73,17 @@ public class ContactFrame extends JFrame implements ContactView {
             int index = contactList.getSelectedIndex();
             if (index != -1) {
                 controllerRef.get().deleteContact(currentContacts.get(index).getId());
+            }
+        });
+
+        updateButton.addActionListener(e -> {
+            int index = contactList.getSelectedIndex();
+            if (index != -1) {
+                controllerRef.get().updateContact(
+                    currentContacts.get(index).getId(),
+                    nameField.getText(),
+                    phoneField.getText(),
+                    emailField.getText());
             }
         });
     }
