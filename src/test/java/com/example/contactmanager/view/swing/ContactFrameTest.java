@@ -27,7 +27,7 @@ public class ContactFrameTest {
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        frame = new ContactFrame(controller);
+        frame = GuiActionRunner.execute(() -> new ContactFrame(controller));
         window = new FrameFixture(frame);
         window.show();
     }
