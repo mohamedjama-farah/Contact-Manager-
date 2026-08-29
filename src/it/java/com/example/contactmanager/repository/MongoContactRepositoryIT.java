@@ -6,6 +6,8 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.testcontainers.containers.MongoDBContainer;
 import com.example.contactmanager.model.Contact;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
 import java.util.List;
 
 public class MongoContactRepositoryIT {
@@ -19,6 +21,10 @@ public class MongoContactRepositoryIT {
     public void setUp() {
         repository = new MongoContactRepository(
             mongo.getConnectionString(), "contactmanager", "contacts");
+        // start each test with an empty collection (test isolation)
+        try (MongoClient client = MongoClients.create(mongo.getConnectionString())) {
+            client.getDatabase("contactmanager").getCollection("contacts").drop();
+        }
     }
 
     @Test
