@@ -3,6 +3,7 @@ package com.example.contactmanager.controller;
 import static org.mockito.Mockito.*;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import com.example.contactmanager.model.Contact;
@@ -25,89 +26,71 @@ public class ContactControllerTest {
 
     @Test
     public void testAllContactsShouldShowAllContactsFromRepository() {
-        List<Contact> contacts = Arrays.asList(new Contact("Mohamed", "0039123456789", "mohamed@example.com"));
+        List<Contact> contacts = Arrays.asList(
+            new Contact("1", "Mohamed", "0039123456789", "mohamed@example.com"));
         when(repository.findAll()).thenReturn(contacts);
         controller.allContacts();
         verify(view).showAllContacts(contacts);
     }
 
     @Test
-    public void testAddContactShouldSaveToRepositoryAndUpdateView() {
-        controller.addContact("Mohamed", "0039123456789", "mohamed@example.com");
-        verify(repository).save(any(Contact.class));
-        verify(view).contactAdded(any(Contact.class));
+    public void testAddContactWhenIdDoesNotExistShouldSaveAndNotify() {
+        Contact contact = new Contact("1", "Mohamed", "0039123456789", "mohamed@example.com");
+        when(repository.findById("1")).thenReturn(null);
+        controller.addContact(contact);
+        InOrder inOrder = inOrder(repository, view);
+        inOrder.verify(repository).save(contact);
+        inOrder.verify(view).contactAdded(contact);
     }
 
     @Test
-    public void testAddContactWithEmptyNameShouldShowErrorAndNotSave() {
-        controller.addContact("", "0039123456789", "mohamed@example.com");
-
-        verify(view).showError("Name is required");
-        verify(repository, never()).save(any(Contact.class));
-        verify(view, never()).contactAdded(any(Contact.class));
-    }
-
-    @Test
-    public void testAddContactWithNullNameShouldShowErrorAndNotSave() {
-        controller.addContact(null, "0039123456789", "mohamed@example.com");
-
-        verify(view).showError("Name is required");
-        verify(repository, never()).save(any(Contact.class));
-        verify(view, never()).contactAdded(any(Contact.class));
-    }
-
-    @Test
-    public void testAddContactWithDuplicatePhoneShouldShowErrorAndNotSave() {
-        Contact existing = new Contact("Mohamed", "0039123456789", "mohamed@example.com");
-        existing.setId("1");
-        when(repository.findAll()).thenReturn(Arrays.asList(existing));
-
-        controller.addContact("Ali", "0039123456789", "ali@example.com");
-
-        verify(view).showError("A contact with phone 0039123456789 already exists");
-        verify(repository, never()).save(any(Contact.class));
-        verify(view, never()).contactAdded(any(Contact.class));
-    }
-
-    @Test
-    public void testAddContactWithDifferentPhoneShouldSave() {
-        Contact existing = new Contact("Mohamed", "0039111111111", "mohamed@example.com");
-        existing.setId("1");
-        when(repository.findAll()).thenReturn(Arrays.asList(existing));
-
-        controller.addContact("Ali", "0039123456789", "ali@example.com");
-
-        verify(repository).save(any(Contact.class));
-        verify(view).contactAdded(any(Contact.class));
-    }
-
-    @Test
-    public void testDeleteContactShouldDeleteFromRepositoryAndUpdateView() {
-        controller.deleteContact("1");
-        verify(repository).delete("1");
-        verify(view).contactDeleted("1");
-    }
-
-    @Test
-    public void testUpdateContactShouldSaveToRepositoryAndUpdateView() {
-        Contact existing = new Contact("Mohamed", "0039123456789", "mohamed@example.com");
-        existing.setId("1");
+    public void testAddContactWhenIdAlreadyExistsShouldShowErrorAndNotSave() {
+        Contact existing = new Contact("1", "Mohamed", "0039123456789", "mohamed@example.com");
+        Contact toAdd = new Contact("1", "Ali", "000111222", "ali@example.com");
         when(repository.findById("1")).thenReturn(existing);
-
-        controller.updateContact("1", "NewName", "000111222", "new@example.com");
-
-        verify(repository).update(any(Contact.class));
-        verify(view).contactUpdated(any(Contact.class));
+        controller.addContact(toAdd);
+        verify(view).showError("Already existing contact with id 1");
+        verify(repository, never()).save(any(Contact.class));
+        verify(view, never()).contactAdded(any(Contact.class));
     }
 
     @Test
-    public void testUpdateContactWhenNotFoundShouldShowError() {
+    public void testUpdateContactWhenIdExistsShouldUpdateAndNotify() {
+        Contact existing = new Contact("1", "Mohamed", "0039123456789", "mohamed@example.com");
+        Contact updated = new Contact("1", "NewName", "000111222", "new@example.com");
+        when(repository.findById("1")).thenReturn(existing);
+        controller.updateContact(updated);
+        InOrder inOrder = inOrder(repository, view);
+        inOrder.verify(repository).update(updated);
+        inOrder.verify(view).contactUpdated(updated);
+    }
+
+    @Test
+    public void testUpdateContactWhenIdDoesNotExistShouldShowErrorAndNotUpdate() {
+        Contact updated = new Contact("99", "X", "Y", "Z");
         when(repository.findById("99")).thenReturn(null);
-
-        controller.updateContact("99", "X", "Y", "Z");
-
+        controller.updateContact(updated);
         verify(view).showError("No existing contact with id 99");
         verify(repository, never()).update(any(Contact.class));
         verify(view, never()).contactUpdated(any(Contact.class));
+    }
+
+    @Test
+    public void testDeleteContactWhenIdExistsShouldDeleteAndNotify() {
+        Contact existing = new Contact("1", "Mohamed", "0039123456789", "mohamed@example.com");
+        when(repository.findById("1")).thenReturn(existing);
+        controller.deleteContact("1");
+        InOrder inOrder = inOrder(repository, view);
+        inOrder.verify(repository).delete("1");
+        inOrder.verify(view).contactDeleted("1");
+    }
+
+    @Test
+    public void testDeleteContactWhenIdDoesNotExistShouldShowErrorAndNotDelete() {
+        when(repository.findById("99")).thenReturn(null);
+        controller.deleteContact("99");
+        verify(view).showError("No existing contact with id 99");
+        verify(repository, never()).delete(anyString());
+        verify(view, never()).contactDeleted(anyString());
     }
 }

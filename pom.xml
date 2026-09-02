@@ -90,6 +90,14 @@
       <scope>test</scope>
     </dependency>
 
+    <!-- EqualsVerifier — tests equals() and hashCode() -->
+    <dependency>
+      <groupId>nl.jqno.equalsverifier</groupId>
+      <artifactId>equalsverifier</artifactId>
+      <version>3.15.6</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <build>

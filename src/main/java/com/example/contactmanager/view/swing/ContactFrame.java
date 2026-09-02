@@ -16,6 +16,7 @@ public class ContactFrame extends JFrame implements ContactView {
     private final AtomicReference<ContactController> controllerRef = new AtomicReference<>();
     private JList<String> contactList;
     private DefaultListModel<String> listModel;
+    private JTextField idField;
     private JTextField nameField;
     private JTextField phoneField;
     private JTextField emailField;
@@ -28,7 +29,7 @@ public class ContactFrame extends JFrame implements ContactView {
         controllerRef.set(initialController);
         setTitle("Contact Manager");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setSize(400, 350);
+        setSize(400, 400);
         setLayout(new BorderLayout());
 
         listModel = new DefaultListModel<>();
@@ -37,6 +38,8 @@ public class ContactFrame extends JFrame implements ContactView {
         add(new JScrollPane(contactList), BorderLayout.CENTER);
 
         JPanel inputPanel = new JPanel(new GridLayout(0, 2));
+        idField = new JTextField();
+        idField.setName("idField");
         nameField = new JTextField();
         nameField.setName("nameField");
         phoneField = new JTextField();
@@ -52,6 +55,8 @@ public class ContactFrame extends JFrame implements ContactView {
         updateButton.setName("updateButton");
         updateButton.setEnabled(false);
 
+        inputPanel.add(new JLabel("Id:"));
+        inputPanel.add(idField);
         inputPanel.add(new JLabel("Name:"));
         inputPanel.add(nameField);
         inputPanel.add(new JLabel("Phone:"));
@@ -70,7 +75,12 @@ public class ContactFrame extends JFrame implements ContactView {
         });
 
         addButton.addActionListener(e -> {
-            controllerRef.get().addContact(nameField.getText(), phoneField.getText(), emailField.getText());
+            controllerRef.get().addContact(new Contact(
+                idField.getText(),
+                nameField.getText(),
+                phoneField.getText(),
+                emailField.getText()));
+            idField.setText("");
             nameField.setText("");
             phoneField.setText("");
             emailField.setText("");
@@ -81,11 +91,11 @@ public class ContactFrame extends JFrame implements ContactView {
                 currentContacts.get(contactList.getSelectedIndex()).getId()));
 
         updateButton.addActionListener(e ->
-            controllerRef.get().updateContact(
+            controllerRef.get().updateContact(new Contact(
                 currentContacts.get(contactList.getSelectedIndex()).getId(),
                 nameField.getText(),
                 phoneField.getText(),
-                emailField.getText()));
+                emailField.getText())));
     }
 
     public void setController(ContactController controller) {
@@ -96,7 +106,8 @@ public class ContactFrame extends JFrame implements ContactView {
         this.currentContacts = contacts;
         listModel.clear();
         for (Contact c : contacts) {
-            listModel.addElement(c.getName() + " - " + c.getPhone() + " - " + c.getEmail());
+            listModel.addElement(
+                c.getId() + " - " + c.getName() + " - " + c.getPhone() + " - " + c.getEmail());
         }
     }
 
