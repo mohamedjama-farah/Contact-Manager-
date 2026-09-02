@@ -5,11 +5,12 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 import org.bson.Document;
-import org.bson.types.ObjectId;
 import java.io.Closeable;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class MongoContactRepository implements ContactRepository, Closeable {
 
@@ -31,55 +32,51 @@ public class MongoContactRepository implements ContactRepository, Closeable {
 
     @Override
     public void save(Contact contact) {
-        Document doc = new Document("name", contact.getName())
-                .append("phone", contact.getPhone())
-                .append("email", contact.getEmail());
-        collection.insertOne(doc);
-        contact.setId(doc.getObjectId("_id").toString());
+        collection.insertOne(new Document()
+            .append("id", contact.getId())
+            .append("name", contact.getName())
+            .append("phone", contact.getPhone())
+            .append("email", contact.getEmail()));
     }
 
     @Override
     public List<Contact> findAll() {
-        List<Contact> contacts = new ArrayList<>();
-        for (Document doc : collection.find()) {
-            Contact contact = new Contact(
-                doc.getString("name"),
-                doc.getString("phone"),
-                doc.getString("email")
-            );
-            contact.setId(doc.getObjectId("_id").toString());
-            contacts.add(contact);
-        }
-        return contacts;
-    }
-
-    @Override
-    public void delete(String id) {
-        collection.deleteOne(new Document("_id", new ObjectId(id)));
+        return StreamSupport
+            .stream(collection.find().spliterator(), false)
+            .map(this::fromDocumentToContact)
+            .collect(Collectors.toList());
     }
 
     @Override
     public Contact findById(String id) {
-        Document doc = collection.find(new Document("_id", new ObjectId(id))).first();
-        if (doc == null) {
-            return null;
+        Document doc = collection.find(Filters.eq("id", id)).first();
+        if (doc != null) {
+            return fromDocumentToContact(doc);
         }
-        Contact contact = new Contact(
-            doc.getString("name"),
-            doc.getString("phone"),
-            doc.getString("email")
-        );
-        contact.setId(doc.getObjectId("_id").toString());
-        return contact;
+        return null;
+    }
+
+    @Override
+    public void delete(String id) {
+        collection.deleteOne(Filters.eq("id", id));
     }
 
     @Override
     public void update(Contact contact) {
         collection.replaceOne(
-            new Document("_id", new ObjectId(contact.getId())),
-            new Document("name", contact.getName())
+            Filters.eq("id", contact.getId()),
+            new Document()
+                .append("id", contact.getId())
+                .append("name", contact.getName())
                 .append("phone", contact.getPhone())
-                .append("email", contact.getEmail())
-        );
+                .append("email", contact.getEmail()));
+    }
+
+    private Contact fromDocumentToContact(Document doc) {
+        return new Contact(
+            "" + doc.get("id"),
+            "" + doc.get("name"),
+            "" + doc.get("phone"),
+            "" + doc.get("email"));
     }
 }

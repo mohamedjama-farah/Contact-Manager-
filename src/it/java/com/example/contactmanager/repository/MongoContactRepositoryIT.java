@@ -1,13 +1,12 @@
 package com.example.contactmanager.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.testcontainers.containers.MongoDBContainer;
 import com.example.contactmanager.model.Contact;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
 import java.util.List;
 
 public class MongoContactRepositoryIT {
@@ -21,71 +20,48 @@ public class MongoContactRepositoryIT {
     public void setUp() {
         repository = new MongoContactRepository(
             mongo.getConnectionString(), "contactmanager", "contacts");
-        // start each test with an empty collection (test isolation)
-        try (MongoClient client = MongoClients.create(mongo.getConnectionString())) {
-            client.getDatabase("contactmanager").getCollection("contacts").drop();
+        for (Contact c : repository.findAll()) {
+            repository.delete(c.getId());
         }
+    }
+
+    @After
+    public void tearDown() {
+        repository.close();
     }
 
     @Test
     public void testSaveAndFindAll() {
-        Contact contact = new Contact("Mohamed", "0039123456789", "mohamed@example.com");
-        repository.save(contact);
+        repository.save(new Contact("1", "Mohamed", "0039123456789", "mohamed@example.com"));
         List<Contact> contacts = repository.findAll();
-        assertThat(contacts).hasSize(1);
-        assertThat(contacts.get(0).getName()).isEqualTo("Mohamed");
-        assertThat(contacts.get(0).getPhone()).isEqualTo("0039123456789");
-        assertThat(contacts.get(0).getEmail()).isEqualTo("mohamed@example.com");
+        assertThat(contacts)
+            .containsExactly(new Contact("1", "Mohamed", "0039123456789", "mohamed@example.com"));
     }
 
     @Test
-    public void testDeleteContact() {
-        Contact contact = new Contact("Mohamed", "0039123456789", "mohamed@example.com");
-        repository.save(contact);
-        String id = repository.findAll().get(0).getId();
-        repository.delete(id);
+    public void testFindByIdWhenContactExists() {
+        repository.save(new Contact("1", "Mohamed", "0039123456789", "mohamed@example.com"));
+        assertThat(repository.findById("1"))
+            .isEqualTo(new Contact("1", "Mohamed", "0039123456789", "mohamed@example.com"));
+    }
+
+    @Test
+    public void testFindByIdWhenContactDoesNotExist() {
+        assertThat(repository.findById("nonexistent")).isNull();
+    }
+
+    @Test
+    public void testUpdate() {
+        repository.save(new Contact("1", "Mohamed", "0039123456789", "mohamed@example.com"));
+        repository.update(new Contact("1", "NewName", "000111222", "new@example.com"));
+        assertThat(repository.findById("1"))
+            .isEqualTo(new Contact("1", "NewName", "000111222", "new@example.com"));
+    }
+
+    @Test
+    public void testDelete() {
+        repository.save(new Contact("1", "Mohamed", "0039123456789", "mohamed@example.com"));
+        repository.delete("1");
         assertThat(repository.findAll()).isEmpty();
-    }
-
-    @Test
-    public void testSaveAssignsGeneratedId() {
-        Contact contact = new Contact("Mohamed", "0039123456789", "mohamed@example.com");
-        repository.save(contact);
-        assertThat(contact.getId()).isNotNull();
-    }
-
-    @Test
-    public void testFindByIdReturnsMatchingContact() {
-        Contact contact = new Contact("Mohamed", "0039123456789", "mohamed@example.com");
-        repository.save(contact);
-        Contact found = repository.findById(contact.getId());
-        assertThat(found.getName()).isEqualTo("Mohamed");
-        assertThat(found.getId()).isEqualTo(contact.getId());
-    }
-
-    @Test
-    public void testFindByIdReturnsNullWhenNotFound() {
-        assertThat(repository.findById(new org.bson.types.ObjectId().toString())).isNull();
-    }
-
-    @Test
-    public void testUpdateChangesExistingContact() {
-        Contact contact = new Contact("Mohamed", "0039123456789", "mohamed@example.com");
-        repository.save(contact);
-        Contact edit = new Contact("NewName", "000111222", "new@example.com");
-        edit.setId(contact.getId());
-        repository.update(edit);
-        Contact reloaded = repository.findById(contact.getId());
-        assertThat(reloaded.getName()).isEqualTo("NewName");
-        assertThat(reloaded.getPhone()).isEqualTo("000111222");
-        assertThat(reloaded.getEmail()).isEqualTo("new@example.com");
-    }
-
-    @Test
-    public void testRepositoryCanBeClosed() {
-        MongoContactRepository repo = new MongoContactRepository(
-            mongo.getConnectionString(), "contactmanager", "close_test");
-        assertThat(repo).isNotNull();
-        repo.close();
     }
 }

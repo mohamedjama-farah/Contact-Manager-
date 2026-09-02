@@ -37,9 +37,22 @@ public class ContactFrameTest {
         window.cleanUp();
     }
 
+    private Contact contact(String id) {
+        return new Contact(id, "Mohamed", "0039123456789", "mohamed@example.com");
+    }
+
+    private void showContact(Contact c) {
+        GuiActionRunner.execute(new GuiTask() {
+            @Override
+            protected void executeInEDT() {
+                frame.showAllContacts(Arrays.asList(c));
+            }
+        });
+    }
+
     @Test
     public void testShowAllContactsDisplaysContactsInList() {
-        List<Contact> contacts = Arrays.asList(new Contact("Mohamed", "0039123456789", "mohamed@example.com"));
+        List<Contact> contacts = Arrays.asList(contact("1"));
         GuiActionRunner.execute(new GuiTask() {
             @Override
             protected void executeInEDT() {
@@ -47,7 +60,7 @@ public class ContactFrameTest {
             }
         });
         window.list("contactList").requireItemCount(1);
-        assertThat(window.list("contactList").contents()[0]).contains("Mohamed");
+        assertThat(window.list("contactList").contents()[0]).contains("1", "Mohamed");
     }
 
     @Test
@@ -60,45 +73,32 @@ public class ContactFrameTest {
     }
 
     @Test
-    public void testAddButtonCallsController() {
+    public void testAddButtonDelegatesToController() {
+        window.textBox("idField").enterText("1");
         window.textBox("nameField").enterText("Mohamed");
         window.textBox("phoneField").enterText("0039123456789");
-        window.textBox("emailField").enterText("mohamedexample.com");
+        window.textBox("emailField").enterText("mohamed@example.com");
         window.button("addButton").click();
-        verify(controller).addContact("Mohamed", "0039123456789", "mohamedexample.com");
+        verify(controller).addContact(new Contact("1", "Mohamed", "0039123456789", "mohamed@example.com"));
     }
 
     @Test
-    public void testDeleteButtonCallsController() {
-        Contact contact = new Contact("Mohamed", "0039123456789", "mohamed@example.com");
-        contact.setId("1");
-        GuiActionRunner.execute(new GuiTask() {
-            @Override
-            protected void executeInEDT() {
-                frame.showAllContacts(Arrays.asList(contact));
-            }
-        });
+    public void testDeleteButtonDelegatesToController() {
+        showContact(contact("1"));
         window.list("contactList").selectItem(0);
         window.button("deleteButton").click();
         verify(controller).deleteContact("1");
     }
 
     @Test
-    public void testUpdateButtonCallsController() {
-        Contact contact = new Contact("Mohamed", "0039123456789", "mohamed@example.com");
-        contact.setId("1");
-        GuiActionRunner.execute(new GuiTask() {
-            @Override
-            protected void executeInEDT() {
-                frame.showAllContacts(Arrays.asList(contact));
-            }
-        });
+    public void testUpdateButtonDelegatesToController() {
+        showContact(contact("1"));
         window.list("contactList").selectItem(0);
         window.textBox("nameField").setText("NewName");
         window.textBox("phoneField").setText("000111222");
         window.textBox("emailField").setText("new@example.com");
         window.button("updateButton").click();
-        verify(controller).updateContact("1", "NewName", "000111222", "new@example.com");
+        verify(controller).updateContact(new Contact("1", "NewName", "000111222", "new@example.com"));
     }
 
     @Test
@@ -109,22 +109,27 @@ public class ContactFrameTest {
 
     @Test
     public void testDeleteAndUpdateButtonsAreEnabledWhenAContactIsSelected() {
-        Contact contact = new Contact("Mohamed", "0039123456789", "mohamed@example.com");
-        contact.setId("1");
-        GuiActionRunner.execute(new GuiTask() {
-            @Override
-            protected void executeInEDT() {
-                frame.showAllContacts(Arrays.asList(contact));
-            }
-        });
+        showContact(contact("1"));
         window.list("contactList").selectItem(0);
         window.button("deleteButton").requireEnabled();
         window.button("updateButton").requireEnabled();
     }
 
     @Test
+    public void testContactAddedRefreshesContacts() {
+        frame.contactAdded(contact("1"));
+        verify(controller).allContacts();
+    }
+
+    @Test
+    public void testContactDeletedRefreshesContacts() {
+        frame.contactDeleted("1");
+        verify(controller).allContacts();
+    }
+
+    @Test
     public void testContactUpdatedRefreshesContacts() {
-        frame.contactUpdated(new Contact("Mohamed", "0039123456789", "mohamed@example.com"));
+        frame.contactUpdated(contact("1"));
         verify(controller).allContacts();
     }
 }

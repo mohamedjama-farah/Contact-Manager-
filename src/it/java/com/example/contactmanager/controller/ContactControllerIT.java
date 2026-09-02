@@ -29,7 +29,6 @@ public class ContactControllerIT {
         closeable = MockitoAnnotations.openMocks(this);
         repository = new MongoContactRepository(
             mongo.getConnectionString(), "contactmanager", "contacts");
-        // start each test with an empty collection
         for (Contact c : repository.findAll()) {
             repository.delete(c.getId());
         }
@@ -44,32 +43,23 @@ public class ContactControllerIT {
 
     @Test
     public void testAddContactPersistsToRepository() {
-        controller.addContact("Mohamed", "0039123456789", "mohamed@example.com");
-
-        assertThat(repository.findAll()).hasSize(1);
-        assertThat(repository.findAll().get(0).getName()).isEqualTo("Mohamed");
+        controller.addContact(new Contact("1", "Mohamed", "0039123456789", "mohamed@example.com"));
+        assertThat(repository.findById("1"))
+            .isEqualTo(new Contact("1", "Mohamed", "0039123456789", "mohamed@example.com"));
     }
 
     @Test
     public void testDeleteContactRemovesFromRepository() {
-        controller.addContact("Mohamed", "0039123456789", "mohamed@example.com");
-        String id = repository.findAll().get(0).getId();
-
-        controller.deleteContact(id);
-
-        assertThat(repository.findAll()).isEmpty();
+        repository.save(new Contact("1", "Mohamed", "0039123456789", "mohamed@example.com"));
+        controller.deleteContact("1");
+        assertThat(repository.findById("1")).isNull();
     }
 
     @Test
     public void testUpdateContactModifiesRepository() {
-        controller.addContact("Mohamed", "0039123456789", "mohamed@example.com");
-        String id = repository.findAll().get(0).getId();
-
-        controller.updateContact(id, "NewName", "000111222", "new@example.com");
-
-        Contact reloaded = repository.findById(id);
-        assertThat(reloaded.getName()).isEqualTo("NewName");
-        assertThat(reloaded.getPhone()).isEqualTo("000111222");
-        assertThat(reloaded.getEmail()).isEqualTo("new@example.com");
+        repository.save(new Contact("1", "Mohamed", "0039123456789", "mohamed@example.com"));
+        controller.updateContact(new Contact("1", "NewName", "000111222", "new@example.com"));
+        assertThat(repository.findById("1"))
+            .isEqualTo(new Contact("1", "NewName", "000111222", "new@example.com"));
     }
 }

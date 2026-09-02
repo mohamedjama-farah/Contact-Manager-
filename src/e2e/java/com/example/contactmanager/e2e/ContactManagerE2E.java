@@ -50,24 +50,23 @@ public class ContactManagerE2E {
         window.cleanUp();
     }
 
-    private void addMohamed() {
-        window.textBox("nameField").enterText("Mohamed");
-        window.textBox("phoneField").enterText("0039123456789");
-        window.textBox("emailField").enterText("mohamed@example.com");
+    private void addContact(String id, String name, String phone, String email) {
+        window.textBox("idField").enterText(id);
+        window.textBox("nameField").enterText(name);
+        window.textBox("phoneField").enterText(phone);
+        window.textBox("emailField").enterText(email);
         window.button("addButton").click();
     }
 
     @Test
     public void testAddContact() {
-        addMohamed();
-        window.list("contactList").requireItemCount(1);
-        assertThat(window.list("contactList").contents()[0]).contains("Mohamed");
+        addContact("1", "Mohamed", "0039123456789", "mohamed@example.com");
+        assertThat(window.list("contactList").contents()[0]).contains("1", "Mohamed");
     }
 
     @Test
     public void testAddAndDeleteContact() {
-        addMohamed();
-        window.list("contactList").requireItemCount(1);
+        addContact("1", "Mohamed", "0039123456789", "mohamed@example.com");
         window.list("contactList").selectItem(0);
         window.button("deleteButton").click();
         window.list("contactList").requireItemCount(0);
@@ -75,10 +74,10 @@ public class ContactManagerE2E {
 
     @Test
     public void testAddAndUpdateContact() {
-        addMohamed();
+        addContact("1", "Mohamed", "0039123456789", "mohamed@example.com");
         window.list("contactList").selectItem(0);
         window.textBox("nameField").setText("Updated");
-        window.textBox("phoneField").setText("0039000000000");
+        window.textBox("phoneField").setText("000111222");
         window.textBox("emailField").setText("updated@example.com");
         window.button("updateButton").click();
         window.list("contactList").requireItemCount(1);
