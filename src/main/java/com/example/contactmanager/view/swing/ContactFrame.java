@@ -13,7 +13,6 @@ public class ContactFrame extends JFrame implements ContactView {
 
     private static final long serialVersionUID = 1L;
 
-
     private final AtomicReference<ContactController> controllerRef = new AtomicReference<>();
     private JList<String> contactList;
     private DefaultListModel<String> listModel;
@@ -48,8 +47,10 @@ public class ContactFrame extends JFrame implements ContactView {
         addButton.setName("addButton");
         deleteButton = new JButton("Delete");
         deleteButton.setName("deleteButton");
+        deleteButton.setEnabled(false);
         updateButton = new JButton("Update");
         updateButton.setName("updateButton");
+        updateButton.setEnabled(false);
 
         inputPanel.add(new JLabel("Name:"));
         inputPanel.add(nameField);
@@ -62,6 +63,12 @@ public class ContactFrame extends JFrame implements ContactView {
         inputPanel.add(updateButton);
         add(inputPanel, BorderLayout.SOUTH);
 
+        contactList.addListSelectionListener(e -> {
+            boolean selected = contactList.getSelectedIndex() != -1;
+            deleteButton.setEnabled(selected);
+            updateButton.setEnabled(selected);
+        });
+
         addButton.addActionListener(e -> {
             controllerRef.get().addContact(nameField.getText(), phoneField.getText(), emailField.getText());
             nameField.setText("");
@@ -69,23 +76,16 @@ public class ContactFrame extends JFrame implements ContactView {
             emailField.setText("");
         });
 
-        deleteButton.addActionListener(e -> {
-            int index = contactList.getSelectedIndex();
-            if (index != -1) {
-                controllerRef.get().deleteContact(currentContacts.get(index).getId());
-            }
-        });
+        deleteButton.addActionListener(e ->
+            controllerRef.get().deleteContact(
+                currentContacts.get(contactList.getSelectedIndex()).getId()));
 
-        updateButton.addActionListener(e -> {
-            int index = contactList.getSelectedIndex();
-            if (index != -1) {
-                controllerRef.get().updateContact(
-                    currentContacts.get(index).getId(),
-                    nameField.getText(),
-                    phoneField.getText(),
-                    emailField.getText());
-            }
-        });
+        updateButton.addActionListener(e ->
+            controllerRef.get().updateContact(
+                currentContacts.get(contactList.getSelectedIndex()).getId(),
+                nameField.getText(),
+                phoneField.getText(),
+                emailField.getText()));
     }
 
     public void setController(ContactController controller) {

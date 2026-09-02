@@ -27,7 +27,7 @@ public class ContactFrameTest {
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        frame = new ContactFrame(controller);
+        frame = GuiActionRunner.execute(() -> new ContactFrame(controller));
         window = new FrameFixture(frame);
         window.show();
     }
@@ -56,7 +56,6 @@ public class ContactFrameTest {
         JOptionPaneFixture optionPane = JOptionPaneFinder.findOptionPane()
             .withTimeout(2000)
             .using(window.robot());
-        assertThat(optionPane).isNotNull();
         optionPane.requireMessage("Test error").okButton().click();
     }
 
@@ -85,18 +84,6 @@ public class ContactFrameTest {
     }
 
     @Test
-    public void testDeleteButtonDoesNothingWhenNoItemSelected() {
-        window.button("deleteButton").click();
-        verify(controller, never()).deleteContact(anyString());
-    }
-
-    @Test
-    public void testContactUpdatedRefreshesContacts() {
-        frame.contactUpdated(new Contact("Mohamed", "0039123456789", "mohamed@example.com"));
-        verify(controller).allContacts();
-    }
-
-    @Test
     public void testUpdateButtonCallsController() {
         Contact contact = new Contact("Mohamed", "0039123456789", "mohamed@example.com");
         contact.setId("1");
@@ -115,8 +102,29 @@ public class ContactFrameTest {
     }
 
     @Test
-    public void testUpdateButtonDoesNothingWhenNoItemSelected() {
-        window.button("updateButton").click();
-        verify(controller, never()).updateContact(anyString(), anyString(), anyString(), anyString());
+    public void testDeleteAndUpdateButtonsAreDisabledInitially() {
+        window.button("deleteButton").requireDisabled();
+        window.button("updateButton").requireDisabled();
+    }
+
+    @Test
+    public void testDeleteAndUpdateButtonsAreEnabledWhenAContactIsSelected() {
+        Contact contact = new Contact("Mohamed", "0039123456789", "mohamed@example.com");
+        contact.setId("1");
+        GuiActionRunner.execute(new GuiTask() {
+            @Override
+            protected void executeInEDT() {
+                frame.showAllContacts(Arrays.asList(contact));
+            }
+        });
+        window.list("contactList").selectItem(0);
+        window.button("deleteButton").requireEnabled();
+        window.button("updateButton").requireEnabled();
+    }
+
+    @Test
+    public void testContactUpdatedRefreshesContacts() {
+        frame.contactUpdated(new Contact("Mohamed", "0039123456789", "mohamed@example.com"));
+        verify(controller).allContacts();
     }
 }

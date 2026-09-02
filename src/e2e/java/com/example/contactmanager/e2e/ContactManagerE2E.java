@@ -1,5 +1,6 @@
 package com.example.contactmanager.e2e;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.swing.launcher.ApplicationLauncher.application;
 
 import javax.swing.JFrame;
@@ -49,15 +50,38 @@ public class ContactManagerE2E {
         window.cleanUp();
     }
 
-    @Test
-    public void testAddAndDeleteContact() {
+    private void addMohamed() {
         window.textBox("nameField").enterText("Mohamed");
         window.textBox("phoneField").enterText("0039123456789");
         window.textBox("emailField").enterText("mohamed@example.com");
         window.button("addButton").click();
+    }
+
+    @Test
+    public void testAddContact() {
+        addMohamed();
+        window.list("contactList").requireItemCount(1);
+        assertThat(window.list("contactList").contents()[0]).contains("Mohamed");
+    }
+
+    @Test
+    public void testAddAndDeleteContact() {
+        addMohamed();
         window.list("contactList").requireItemCount(1);
         window.list("contactList").selectItem(0);
         window.button("deleteButton").click();
         window.list("contactList").requireItemCount(0);
+    }
+
+    @Test
+    public void testAddAndUpdateContact() {
+        addMohamed();
+        window.list("contactList").selectItem(0);
+        window.textBox("nameField").setText("Updated");
+        window.textBox("phoneField").setText("0039000000000");
+        window.textBox("emailField").setText("updated@example.com");
+        window.button("updateButton").click();
+        window.list("contactList").requireItemCount(1);
+        assertThat(window.list("contactList").contents()[0]).contains("Updated");
     }
 }
