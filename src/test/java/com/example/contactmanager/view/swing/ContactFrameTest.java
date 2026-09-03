@@ -74,10 +74,10 @@ public class ContactFrameTest {
 
     @Test
     public void testAddButtonDelegatesToController() {
-        window.textBox("idField").enterText("1");
-        window.textBox("nameField").enterText("Mohamed");
-        window.textBox("phoneField").enterText("0039123456789");
-        window.textBox("emailField").enterText("mohamed@example.com");
+        window.textBox("idField").setText("1");
+        window.textBox("nameField").setText("Mohamed");
+        window.textBox("phoneField").setText("0039123456789");
+        window.textBox("emailField").setText("mohamed@example.com");
         window.button("addButton").click();
         verify(controller).addContact(new Contact("1", "Mohamed", "0039123456789", "mohamed@example.com"));
     }
