@@ -1,6 +1,7 @@
 package com.example.contactmanager.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -46,6 +47,7 @@ public class ContactControllerIT {
         controller.addContact(new Contact("1", "Mohamed", "0039123456789", "mohamed@example.com"));
         assertThat(repository.findById("1"))
             .isEqualTo(new Contact("1", "Mohamed", "0039123456789", "mohamed@example.com"));
+        verify(view).contactAdded(new Contact("1", "Mohamed", "0039123456789", "mohamed@example.com"));
     }
 
     @Test
@@ -53,6 +55,7 @@ public class ContactControllerIT {
         repository.save(new Contact("1", "Mohamed", "0039123456789", "mohamed@example.com"));
         controller.deleteContact("1");
         assertThat(repository.findById("1")).isNull();
+        verify(view).contactDeleted("1");
     }
 
     @Test
@@ -61,5 +64,6 @@ public class ContactControllerIT {
         controller.updateContact(new Contact("1", "NewName", "000111222", "new@example.com"));
         assertThat(repository.findById("1"))
             .isEqualTo(new Contact("1", "NewName", "000111222", "new@example.com"));
+        verify(view).contactUpdated(new Contact("1", "NewName", "000111222", "new@example.com"));
     }
 }
